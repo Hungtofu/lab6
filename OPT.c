@@ -205,3 +205,79 @@ void OPT(int A[], int frames[], int NumOf_frames, int n)
     printf("So trang loi la: %d\n", count);
     free(position);
 }
+
+void LRU(int A[], int frames[], int NumOf_frames, int n)
+{
+    printf(" ____________________________________\n");
+    printf("|---LRU Page Replacement Algorithm---|\n");
+    printf("|____________________________________|\n");
+    int i, j, k, available;
+    int a, b, c;
+    int count = 0;
+    int *pos =(int*)malloc( NumOf_frames*sizeof(int));
+    for (i = 0; i < NumOf_frames; i++)
+        frames[i] = -1; // Giả sử ban đầu các frame trống
+    j = 0;
+    printf("\t|Chuoi|\t|Khung trang");
+    for (k = 0; k < NumOf_frames - 1; k++)
+        printf("\t");
+    printf("| \n");
+    for (i = 1; i <= n; i++)
+    {
+        printf("\t| %d | \t", A[i]);
+        available = 0; // trang không có sẵn
+        for (k = 0; k < NumOf_frames; k++)
+            if (frames[k] == A[i]) // kiểm tra trang có sẵn
+                available = 1;     // trang có sẵn
+        if (available == 0)        // thay thế trang nếu không có sẵn
+        {
+
+            if (i <= NumOf_frames)
+            {
+                frames[j] = A[i];
+                j = (j + 1) % NumOf_frames; 
+            }
+            else
+            {
+                // lưu lại thời gian tham chiếu vào frames của các trang trong frames
+                j = n;
+                for (a = 0; a < NumOf_frames; a++)
+                    for (b = i - 1; b >= 0; b--)
+                        if (frames[a] == A[b])
+                        {
+                            pos[a] = b;
+                            b = 0;
+                        }
+
+                //tìm ra trang tham chiếu trễ nhất trong quá khứ
+                for (a = 0; a < NumOf_frames; a++)
+                    if (pos[a] < j) // trang tham chiếu càng trễ thì càng bé hơn tổng số trang tham chiếu
+                    {
+                        j = pos[a];
+                        c = a;
+                    }
+                // cài đặt giá trị của temp về ban đầu
+                for (j = 0; j < NumOf_frames; j++)
+                    pos[j] = -1;
+
+                // thay thế trang 
+                frames[c] = A[i];
+            }
+            count++;
+            printf("|");
+            for (k = 0; k < NumOf_frames; k++)
+                printf("%d\t", frames[k]);
+            printf("| *"); // Dấu hiệu nhận biết xảy ra lỗi trang
+        }
+        else
+        {
+            printf("|");
+            for (k = 0; k < NumOf_frames; k++)
+                printf("%d\t", frames[k]);
+            printf("|");
+        }
+        printf("\n");
+    }
+    printf("So trang loi la: %d\n", count);
+    free(pos);
+}
